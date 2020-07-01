@@ -1,0 +1,40 @@
+{
+  "name": "jwt-server-util",
+  "version": "1.0.0",
+  "description": "Utility library for serving JWTs.",
+  "main": "cjs/",
+  "module": "esm/",
+  "scripts": {
+    "test": "jest ./test",
+    "clean": "rm -rf cjs",
+    "lint": "esw --color --watch ./esm ./test",
+    "build": "npm run clean && babel esm --out-dir cjs",
+    "prepare": "npm test && npm run build",
+    "generate-cert-serial-number": "node scripts/generate-cert-serial-number"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cullylarson/jwt-server-util.git"
+  },
+  "author": "Cully Larson <cully.larson@gmail.com>",
+  "homepage": "https://github.com/cullylarson/jwt-server-util#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "eslint": "^7.3.1",
+    "eslint-plugin-jest": "^23.17.1",
+    "eslint-watch": "^7.0.0",
+    "jest": "^26.1.0",
+    "standard": "^14.3.4"
+  },
+  "dependencies": {
+    "base64url": "^3.0.1",
+    "node-forge": "^0.9.1",
+    "node-rsa": "^1.0.8"
+  }
+}
