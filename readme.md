@@ -85,7 +85,7 @@ const signJwt = (issuer, audience, claimsNamespace, kid, expiresIn, privateKey) 
 
     const certAndKeys = getCertAndKeys(config.issuer, key.publicKeyPem, key.privateKeyPem, key.serialNumber, key.validNotBefore, key.validNotAfter)
 
-    const jwt = await signJwt(config.issuer, config.audience, config.claimsNamespace, config.expiresIn, certAndKeys.cert.kid, certAndKeys.pair.privateKey)
+    const jwt = await signJwt(config.issuer, config.audience, config.claimsNamespace, config.expiresIn, certAndKeys.cert.kid, certAndKeys.pair.priv)
 })()
 ```
 
