@@ -5,6 +5,7 @@
         "https://alt.example.com"
     ],
     "claimsNamespace": "example.com",
+    "expiresIn": 86400,
     "keys": [
         {
             "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzuDBl1mVd641PAfW6Hvw\nDSM/CdOnBcwZ5e4MvR9V+9Oxggk13p5r0m+8WOXXYOYDopK292+ZEKOkc9xBZVNh\nDP8O/0bIrp7w4FahwAqovnGI9jYUbnPxzJouIk3lMwHZpkifnUPWVfohdU76tUTZ\n7JUFTX0naoW0hX7QOJp/l8bpeXQnQqnhDeU8ddZg+mOjzh9tB2AJk4jU1CP8OwOB\nExPV4cJzRoYKrRdu9lSYnz59t5OGZ26DJVBfJPDBZwAj4h/FQcaolUAN5ym/gwcY\n/S9KbGMID77s3ieHGFd4NGcH871/57dX5Z3m8/grVpucDB8HyIL0cVfaZErIB75x\n9QIDAQAB\n-----END PUBLIC KEY-----\n",

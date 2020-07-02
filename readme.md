@@ -15,7 +15,7 @@ In order to issue a JWT, you'll need the following information:
 - Serial number. Must be an integer, 20 bytes or less, hex encoded. Use `npm run generate-cert-serial-number` to generate one.
 - validNotBefore. Don't consider the issuing key to be valid before this date (c.f. [Certificate Properties](https://docs.microsoft.com/en-us/windows/desktop/seccrypto/certificate-properties)). Should be a date that can be passed to the Date() constructor (e.g. "2019-05-23T00:00:00").
 - validNotAfter. Don't consider the issuing keys to be valid after this date (c.f. [Certificate Properties](https://docs.microsoft.com/en-us/windows/desktop/seccrypto/certificate-properties)). Should be a date that can be passed to the Date() constructor (e.g. "2019-05-23T00:00:00").
-- JWT Lasts. How long you want the JWT to last (in seconds).
+- Expires In. How long you want the JWT to last (in seconds).
 - Issuer. A value that identifies who issued the JWT (c.f. [RFC 7519](https://tools.ietf.org/html/rfc7519#section-4.1.1)). Also used as the Common Name when signing the certificate used to issue and verify the JWTs. However, since it is used entirely interally, it does not need to be a URL.
 - Audience. One or more recipients for the JWT (c.f. [RFC 7519](https://tools.ietf.org/html/rfc7519#section-4.1.3)).
 - Claim Namespace. The namespace used for custom claims.
@@ -54,9 +54,9 @@ import {pki} from 'node-forge'
 
 const signP = promisify(sign)
 
-const signJwt = (issuer, audience, claimsNamespace, kid, privateKey) => {
+const signJwt = (issuer, audience, claimsNamespace, kid, expiresIn, privateKey) => {
     const payload = {
-        // these are all custom claims. they can be whatever you want
+        // these are all custom claims. they can be whatever you want.
         [claimsNamespace]: {
             account: {
                 name: 'Human Person',
@@ -85,7 +85,7 @@ const signJwt = (issuer, audience, claimsNamespace, kid, privateKey) => {
 
     const certAndKeys = getCertAndKeys(config.issuer, key.publicKeyPem, key.privateKeyPem, key.serialNumber, key.validNotBefore, key.validNotAfter)
 
-    const jwt = await signJwt(config.issuer, config.audience, config.claimsNamespace, certAndKeys.cert.kid, certAndKeys.pair.privateKey)
+    const jwt = await signJwt(config.issuer, config.audience, config.claimsNamespace, config.expiresIn, certAndKeys.cert.kid, certAndKeys.pair.privateKey)
 })()
 ```
 
