@@ -5,6 +5,25 @@ import NodeRSA from 'node-rsa'
 
 const isObject = x => x !== null && typeof x === 'object'
 
+// taken from: https://github.com/juanelas/bigint-conversion
+function bigintToBuf(num) {
+    if(num < 0) throw RangeError('Value should be a non-negative integer. Negative values are not supported.')
+
+    let hexStr = num.toString(16)
+    hexStr = !(hexStr.length % 2) ? hexStr : '0' + hexStr
+
+    return Buffer.from(hexStr, 'hex')
+}
+
+// num can be a Number, BigInt, or Buffer
+function base64UrlUIntEncode(num) {
+    const buff = Buffer.isBuffer(num)
+        ? num
+        : bigintToBuf(num)
+
+    return base64url.fromBase64(buff.toString('base64'))
+}
+
 export const getModulusExponent = publicKey => {
     const nodeRsa = new NodeRSA()
     nodeRsa.importKey(forge.pki.publicKeyToPem(publicKey))
@@ -49,12 +68,11 @@ export const getCertificateDer = certPem => {
 }
 
 export const getCertThumbprint = certDer => {
-    const derBinaryStr = Buffer.from(certDer).toString('binary')
+    const derBuffer = Buffer.from(certDer, 'base64')
 
-    const shasum = createHash('sha1')
-    shasum.update(derBinaryStr)
-
-    return shasum.digest('base64')
+    return createHash('sha1')
+        .update(derBuffer)
+        .digest()
 }
 
 export const getCertThumbprintEncoded = certDer => base64url.encode(getCertThumbprint(certDer))
@@ -75,10 +93,12 @@ export const getCertAndKeys = (issuer, publicKeyPem, privateKeyPem, certSerialNu
         },
         cert: {
             modulus,
+            modulusB64: base64UrlUIntEncode(modulus),
             exponent,
+            exponentB64: base64UrlUIntEncode(exponent),
             certPem,
             certDer,
-            thumbprintEncoded,
+            thumbprintEncoded, // x5t
             kid: thumbprintEncoded,
         },
     }

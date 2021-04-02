@@ -132,8 +132,8 @@ const JwksAction = (certs) => {
         kty: 'RSA',
         use: 'sig',
         x5c: [cert.certDer],
-        e: String(cert.exponent),
-        n: cert.modulus.toString('base64'),
+        e: cert.exponentB64,
+        n: cert.modulusB64,
         kid: cert.kid,
         x5t: cert.thumbprintEncoded,
     }))

@@ -1,5 +1,7 @@
 import fs from 'fs'
 import path from 'path'
+import Mitm from 'mitm'
+import jwksClient from 'jwks-rsa'
 import {getCertAndKeys} from '../esm/'
 
 const getConfigFile = async (filePath) => {
@@ -29,6 +31,48 @@ test('Generates information correctly.', async () => {
     expect(certAndKeys.pair.priv.d.data.toString(10)).toBe('41116833,130821543,69395950,167203315,160687114,132770236,85242714,218807329,202596590,246913027,204672936,62257232,45226542,30090014,249643753,229814300,115810827,82100494,63136671,219222725,33137628,78787936,105445016,8708220,83441200,67086116,267229810,261275812,73799683,72613538,35277138,112599174,195953145,218524976,98248400,870975,102874877,194716957,117948763,86721885,260334948,236820037,191543614,241128989,248489875,7983458,135434576,4105152,30790483,255401461,232174859,245934214,214676887,37913838,189329393,71033408,11023067,99915906,87906856,83379505,233480796,167905703,73051350,75136258,13862144,235969133,123209449,23859045,209264258,121178874,251569806,256914736,212255362,11')
     expect(certAndKeys.pair.priv.p.data.toString(10)).toBe('246652713,179851127,122372728,252223306,194237801,63999504,226620548,20212883,17538602,95285737,24620817,170920923,36970411,108067739,263921492,144579732,5166015,263757504,137441875,105575450,235621409,260302564,132041096,159978935,199948138,156882571,108045871,204639754,115357087,74988415,6475651,47910890,27581436,233245998,161488501,50872826,59383')
     expect(certAndKeys.pair.priv.q.data.toString(10)).toBe('234582509,13469181,210921774,77731127,49933816,156059913,179090534,62206449,182465463,100421878,183930334,150226942,40795477,153533513,15579051,243580087,54462152,149199269,176664376,215528070,214572153,240311105,29520120,16071250,251754704,246868748,137105914,62395795,99092919,171150361,191008722,180588012,137754419,98619745,79689578,33715436,58448')
-    expect(certAndKeys.cert.thumbprintEncoded).toBe('KzR5K3U3cXVvY0V1NHAyY0lyRjF0Uzg0Y253PQ')
-    expect(certAndKeys.cert.kid).toBe('KzR5K3U3cXVvY0V1NHAyY0lyRjF0Uzg0Y253PQ')
+    expect(certAndKeys.cert.thumbprintEncoded).toBe('ZNiprIaUCJ5f10FaFF8XWgQ8OkU')
+    expect(certAndKeys.cert.kid).toBe('ZNiprIaUCJ5f10FaFF8XWgQ8OkU')
+})
+
+describe('Works with jwks-rsa.', () => {
+    let mitm
+    beforeEach(() => {
+        mitm = Mitm()
+    })
+
+    afterEach(() => {
+        mitm.disable()
+    })
+
+    test("jwks-rsa doesn't complain about it.", async () => {
+        const config = await getConfigFile(path.join(__dirname, 'files/config.json'))
+        const key = config.keys[0]
+
+        const certAndKeys = getCertAndKeys('https://example.com', key.publicKeyPem, key.privateKeyPem, key.serialNumber, key.validNotBefore, key.validNotAfter)
+
+        const cert = certAndKeys.cert
+
+        const keys = [{
+            alg: 'RSA256',
+            kty: 'RSA',
+            use: 'sig',
+            x5c: [cert.certDer],
+            e: cert.exponentB64,
+            n: cert.modulusB64,
+            kid: cert.kid,
+            x5t: cert.thumbprintEncoded,
+        }]
+
+        mitm.on('request', (req, res) => {
+            res.end(JSON.stringify({keys}))
+        })
+
+        const client = jwksClient({
+            jwksUri: 'http://localhost:3333',
+        })
+
+        // we should get an exception if this doesn't work
+        await client.getSigningKey(cert.kid)
+    })
 })
